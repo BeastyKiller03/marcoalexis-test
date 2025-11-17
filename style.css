@@ -1,69 +1,90 @@
-/* Page base */
-body {
-  margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-  background: #000;  /* outside area (won’t really show because main-content fills screen) */
-  color: #111;
+/* RESET + BASE */
+* {
+  box-sizing: border-box;
 }
 
-/* Top-left title */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+/* page background */
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  background: #000;          /* black border around the white panel */
+  color: #111;
+  overflow: hidden;          /* prevent vertical scroll "jiggle" */
+}
+
+/* TOP LEFT NAME */
+.top-corner-title {
+  position: fixed;
+  top: 16px;
+  left: 24px;
+  z-index: 10;
+}
+
 .top-corner-title a {
-  color: #000;
-  text-decoration: none;
   font-size: 12px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  text-decoration: none;
+  color: #111;
 }
 
-.top-corner-title a:hover {
-  opacity: 0.6;
-}
-
-/* Top-right nav */
+/* TOP RIGHT MENU */
 .header {
   position: fixed;
   top: 16px;
   right: 24px;
-  z-index: 20;
+  z-index: 10;
+}
+
+.header .links {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: nowrap;
 }
 
 .header .links a {
   font-size: 12px;
-  margin-left: 16px;
   text-decoration: none;
   color: #111;
+  white-space: nowrap;
 }
 
-/* FULL-SCREEN WHITE BACKGROUND */
+/* MAIN FULL-SCREEN WHITE PANEL */
 .main-content {
   height: 100vh;
   width: 100%;
-  background: #faf9f6;      /* soft white */
+  background: #faf9f6;          /* soft white panel */
   display: flex;
-  align-items: center;      /* vertical center */
-  justify-content: center;  /* horizontal center */
-  box-sizing: border-box;
-  padding: 80px 60px;       /* breathing room from edges */
+  align-items: center;
+  justify-content: center;
 }
 
-/* Frame that caps the width of the strip */
+/* container for horizontal row */
 .gallery-frame {
   width: 100%;
-  max-width: 1400px;        /* how wide the “film strip” can go */
-  margin: 0 auto;
+  max-width: 1400px;
+  padding: 0 40px;
+  box-sizing: border-box;
 }
 
-/* Horizontal scrolling row */
+/* HORIZONTAL SCROLL ROW */
 .gallery-row {
   display: flex;
   gap: 1.5rem;
   overflow-x: auto;
   overflow-y: hidden;
   scroll-behavior: smooth;
-  padding-bottom: 0.75rem;  /* space so scrollbar isn't cut off */
+  padding-bottom: 0.5rem;
+  align-items: center;
 }
 
-/* VERY LIGHT SCROLLBAR */
+/* faint horizontal scrollbar */
 .gallery-row::-webkit-scrollbar {
   height: 4px;
 }
@@ -73,29 +94,99 @@ body {
 }
 
 .gallery-row::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.08);
+  background: rgba(0,0,0,0.08);
   border-radius: 4px;
 }
 
 .gallery-row:hover::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.15);
+  background: rgba(0,0,0,0.15);
 }
 
-/* Images */
+/* IMAGES – DESKTOP */
 .gallery-row a img {
-  height: 260px;  /* adjust this if you want taller/shorter */
+  height: 260px;
   width: auto;
   object-fit: cover;
   display: block;
 }
 
-/* Footer bottom-center */
+/* Video thumbs same size */
+.gallery-row a.video-thumb img {
+  height: 260px;
+}
+
+/* FOOTER */
 .footer {
   position: fixed;
   bottom: 16px;
   left: 50%;
   transform: translateX(-50%);
   font-size: 10px;
+  color: #111;
 }
 
+.footer a {
+  color: inherit;
+  text-decoration: none;
+}
 
+/* ------------------- */
+/* RESPONSIVE: MOBILE  */
+/* ------------------- */
+
+@media (max-width: 768px) {
+  body {
+    overflow: hidden; /* still no vertical scroll */
+  }
+
+  .top-corner-title {
+    top: 10px;
+    left: 12px;
+  }
+
+  .top-corner-title a {
+    font-size: 11px;
+  }
+
+  .header {
+    top: 40px;
+    right: 0;
+    left: 0;
+    padding: 0 12px;
+  }
+
+  .header .links {
+    justify-content: center;
+    flex-wrap: wrap;           /* allow wrapping instead of squeezing */
+    gap: 8px 12px;
+  }
+
+  .header .links a {
+    font-size: 11px;
+  }
+
+  .main-content {
+    padding-top: 60px;         /* give space so menu doesn’t overlap images */
+    padding-bottom: 40px;
+    box-sizing: border-box;
+  }
+
+  .gallery-frame {
+    padding: 0 16px;
+  }
+
+  .gallery-row {
+    gap: 1rem;
+  }
+
+  /* Scale images down so you don’t only see half of one */
+  .gallery-row a img,
+  .gallery-row a.video-thumb img {
+    height: 180px;             /* smaller for phone */
+  }
+
+  .footer {
+    bottom: 8px;
+    font-size: 9px;
+  }
+}
