@@ -1,4 +1,4 @@
-/* --- GLOBAL RESET --- */
+/* RESET / BASE */
 *,
 *::before,
 *::after {
@@ -9,18 +9,19 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont,
-    "Helvetica Neue", Arial, sans-serif;
-  background: #000;
-  color: #000;
+  overflow: hidden;                 /* no vertical scroll */
 }
 
-/* Prevent vertical scroll on index/photos layouts */
-body.fullscreen {
-  overflow: hidden;
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+
+  /* FULL-SCREEN BACKGROUND IMAGE
+     Change the file name whenever you want a new monthly background. */
+  background: #000 url("bg_index.jpg") center center / cover no-repeat fixed;
+  color: #111;
 }
 
-/* --- TOP TITLE (LEFT) --- */
+/* TOP-LEFT NAME */
 .top-corner-title {
   position: fixed;
   top: 16px;
@@ -36,7 +37,7 @@ body.fullscreen {
   color: #111;
 }
 
-/* --- TOP MENU (RIGHT) --- */
+/* TOP-RIGHT MENU */
 .header {
   position: fixed;
   top: 16px;
@@ -46,9 +47,9 @@ body.fullscreen {
 
 .header .links {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: wrap;                 /* allows wrapping on smaller screens */
   justify-content: flex-end;
-  gap: 10px 16px;
+  gap: 12px;
 }
 
 .header .links a {
@@ -57,187 +58,125 @@ body.fullscreen {
   color: #111;
 }
 
-/* --- INDEX: FULLSCREEN BACKGROUND + HORIZONTAL GALLERY --- */
+.header .links a:hover {
+  opacity: 0.6;
+}
+
+/* MAIN AREA – centered horizontally */
 .main-content {
-  position: relative;
   height: 100vh;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0 40px;
-  /* background image is set via JS per month */
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
-.main-content::before {
-  /* optional very light wash overlay to keep text readable */
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(250, 249, 246, 0.15);
-  pointer-events: none;
+  box-sizing: border-box;
 }
 
 .gallery-frame {
-  position: relative;
-  z-index: 1; /* above overlay */
   width: 100%;
   max-width: 1200px;
 }
 
-/* Horizontal scroll row */
+/* HORIZONTAL SCROLL STRIP */
 .gallery-row {
   display: flex;
-  gap: 1.5rem;
+  gap: 16px;
   overflow-x: auto;
   overflow-y: hidden;
   scroll-behavior: smooth;
-  padding-bottom: 0.5rem;
+  padding-bottom: 8px;             /* space so scrollbar isn't cut off */
 }
 
-/* Subtle horizontal scrollbar */
+/* Super light horizontal scrollbar */
 .gallery-row::-webkit-scrollbar {
   height: 4px;
 }
+
 .gallery-row::-webkit-scrollbar-track {
   background: transparent;
 }
+
 .gallery-row::-webkit-scrollbar-thumb {
   background: rgba(0,0,0,0.08);
   border-radius: 4px;
 }
+
 .gallery-row:hover::-webkit-scrollbar-thumb {
   background: rgba(0,0,0,0.15);
 }
 
-/* Thumbnails */
+/* Images in strip */
 .gallery-row a img {
-  height: 220px;
+  height: 260px;
   width: auto;
   object-fit: cover;
   display: block;
 }
 
-/* Footer centered bottom */
+/* Video thumbs same height so everything lines up */
+.gallery-row a.video-thumb img {
+  height: 260px;
+}
+
+/* FOOTER */
 .footer {
   position: fixed;
   bottom: 16px;
   left: 50%;
   transform: translateX(-50%);
   font-size: 10px;
-  z-index: 10;
+  z-index: 20;
 }
+
 .footer a {
   text-decoration: none;
   color: #111;
 }
 
-/* --- PHOTOS PAGE: FULLSCREEN VIEWER WITH ARROWS --- */
-body.photos-page {
-  background: #faf9f6;
-}
+/* =========================
+   MOBILE TWEAKS
+   ========================= */
 
-.viewer {
-  position: relative;
-  height: 100vh;
-  width: 100vw;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 80px;
-  overflow: hidden;
-}
-
-.viewer img {
-  max-width: calc(100vw - 260px); /* space for sidebar + arrows */
-  max-height: 80vh;
-  object-fit: contain;
-  display: block;
-  box-shadow: 0 0 12px rgba(0,0,0,0.18);
-  border-radius: 4px;
-}
-
-/* arrows */
-.nav-arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  border: none;
-  background: none;
-  font-size: 2rem;
-  line-height: 1;
-  padding: 0;
-  cursor: pointer;
-  opacity: 0.35;
-  transition: opacity 0.2s ease;
-  user-select: none;
-  z-index: 5;
-}
-.nav-arrow:hover {
-  opacity: 0.8;
-}
-.nav-arrow.left {
-  left: 40px;
-}
-.nav-arrow.right {
-  right: 40px;
-}
-
-/* hidden gallery used as photo list */
-.gallery-hidden {
-  display: none;
-}
-
-/* --- RESPONSIVE / MOBILE --- */
-@media (max-width: 900px) {
-  .main-content {
-    padding: 0 16px;
+@media (max-width: 768px) {
+  /* allow slight vertical scroll if needed so menu doesn't clash with footer */
+  html, body {
+    overflow-y: hidden;         /* keep no vertical scroll if you want it strict */
   }
 
-  .gallery-row a img {
-    height: 160px; /* smaller so more than 1/2 image shows */
+  .top-corner-title {
+    top: 10px;
+    left: 12px;
+    font-size: 11px;
+  }
+
+  .header {
+    top: 34px;
+    right: 12px;
+    left: 12px;
+  }
+
+  .header .links {
+    justify-content: flex-start;
+    gap: 8px;
   }
 
   .header .links a {
     font-size: 10px;
   }
+
+  .main-content {
+    padding: 0 16px;
+  }
+
+  .gallery-row a img,
+  .gallery-row a.video-thumb img {
+    height: 150px;          /* smaller images so you see them fully */
+  }
+
+  .footer {
+    bottom: 10px;
+    font-size: 9px;
+  }
 }
 
-@media (max-width: 768px) {
-  .header {
-    top: 12px;
-    right: 12px;
-    left: auto;
-    max-width: 70%;
-  }
-
-  .header .links {
-    gap: 6px 10px;
-  }
-
-  .top-corner-title {
-    top: 12px;
-    left: 12px;
-  }
-
-  .gallery-row a img {
-    height: 140px;
-  }
-
-  .viewer {
-    padding: 0 40px;
-  }
-  .viewer img {
-    max-width: calc(100vw - 120px);
-    max-height: 70vh;
-  }
-  .nav-arrow.left {
-    left: 16px;
-  }
-  .nav-arrow.right {
-    right: 16px;
-  }
-}
