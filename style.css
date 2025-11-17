@@ -17,7 +17,7 @@ body {
 
   /* FULL-SCREEN BACKGROUND IMAGE
      Change the file name whenever you want a new monthly background. */
-  background: #000 url("bg_index.jpg") center center / cover no-repeat fixed;
+  background: #000 url("bg_01.jpg") center center / cover no-repeat fixed;
   color: #111;
 }
 
