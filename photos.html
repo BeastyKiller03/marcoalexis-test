@@ -3,21 +3,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Photos - PerfectlyCraftedMusic</title>
+  <title>Photos - Marco Maria</title>
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     html, body {
       margin: 0;
       padding: 0;
+      height: 100%;
       font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-      background: #fff;
-      overflow-x: hidden;
-      scroll-behavior: auto;
+      background: #faf9f6;         /* soft white */
+      color: #000;
+      overflow: hidden;            /* no scroll – we use arrows instead */
     }
-    :target { scroll-margin-top: 100px; }
 
-    /* Top-right title (stays over images) */
+    /* tiny offset when jumping to #imgX (hash is updated in JS) */
+    :target {
+      scroll-margin-top: 100px;
+    }
+
+    /* Top-right title */
     .top-corner-title {
       position: fixed;
       top: 20px;
@@ -32,7 +39,7 @@
       opacity: 0.9;
     }
 
-    /* OVERLAY menu (does not push or shift the gallery) */
+    /* Left overlay nav */
     .header {
       position: fixed;
       top: 0;
@@ -43,35 +50,102 @@
       display: flex;
       flex-direction: column;
       gap: 15px;
-      background: transparent;      /* see photos beneath; change to rgba(255,255,255,.85) if you want a veil */
-      z-index: 1002;                /* above images */
+      background: transparent;
+      z-index: 1002;
     }
     .header a {
       color: #000;
       text-decoration: none;
-      font-size: 1rem;
+      font-size: 0.95rem;
     }
-    .header a:hover { opacity: .6; }
+    .header a:hover {
+      opacity: 0.6;
+    }
 
-    /* CENTERED gallery (unchanged, like index vibe) */
-    .gallery {
-      width: 100%;
-      max-width: 900px;             /* keeps column nicely centered */
-      margin: 0 auto;               /* <-- center the whole block */
-      padding: 2rem 1rem;
+    /* MAIN VIEWER (fullscreen white background with one big photo) */
+    .viewer {
+      position: relative;
+      height: 100vh;
+      width: 100vw;
       display: flex;
-      flex-direction: column;
-      align-items: center;          /* center each image */
-      gap: 2rem;
-      z-index: 1;                   /* under the menu */
+      align-items: center;
+      justify-content: center;
+      padding: 0 80px;
+      background: #faf9f6;
+      overflow: hidden;
     }
-    .gallery img {
-      width: auto;
-      max-width: min(90vw, 800px);  /* same feel as index, never exceed 800px */
-      height: auto;
+
+    .viewer img {
+      max-width: calc(100vw - 260px);   /* leave space for sidebar + arrows */
+      max-height: 80vh;
+      object-fit: contain;
       display: block;
+      box-shadow: 0 0 12px rgba(0,0,0,0.18);
       border-radius: 4px;
-      box-shadow: 0 0 10px rgba(0,0,0,.2);
+    }
+
+    /* LEFT + RIGHT ARROWS */
+    .nav-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      border: none;
+      background: none;
+      font-size: 2rem;
+      line-height: 1;
+      padding: 0;
+      cursor: pointer;
+      opacity: 0.35;
+      transition: opacity 0.2s ease;
+      user-select: none;
+    }
+
+    .nav-arrow:hover {
+      opacity: 0.8;
+    }
+
+    .nav-arrow.left {
+      left: 40px;
+    }
+
+    .nav-arrow.right {
+      right: 40px;
+    }
+
+    /* Make sure arrows sit above everything */
+    .nav-arrow span {
+      display: block;
+    }
+
+    /* HIDDEN original gallery images – kept only as data + for IDs (#img1, etc.) */
+    .gallery {
+      display: none;
+    }
+
+    /* Mobile tweaks */
+    @media (max-width: 768px) {
+      .header {
+        width: auto;
+        height: auto;
+        padding: 20px;
+        background: transparent;
+      }
+
+      .viewer {
+        padding: 0 40px;
+      }
+
+      .viewer img {
+        max-width: calc(100vw - 120px);
+        max-height: 70vh;
+      }
+
+      .nav-arrow.left {
+        left: 16px;
+      }
+      .nav-arrow.right {
+        right: 16px;
+      }
     }
   </style>
 </head>
@@ -80,7 +154,7 @@
     <p>perfectlycraftedmusic</p>
   </div>
 
-  <!-- OVERLAY sidebar (will overlap the gallery) -->
+  <!-- OVERLAY sidebar -->
   <div class="header">
     <a href="index.html">Home</a>
     <a href="videos.html">Videos</a>
@@ -92,7 +166,20 @@
     <a href="background.html">Background</a>
   </div>
 
-  <!-- CENTERED column of photos -->
+  <!-- SINGLE big centered photo with arrows -->
+  <div class="viewer">
+    <button class="nav-arrow left" aria-label="Previous photo">
+      <span>&#10094;</span>
+    </button>
+
+    <img id="current-photo" src="IMG_1.jpg" alt="">
+
+    <button class="nav-arrow right" aria-label="Next photo">
+      <span>&#10095;</span>
+    </button>
+  </div>
+
+  <!-- HIDDEN images used as source list + deep-link IDs -->
   <div class="gallery">
     <img id="img1"  src="IMG_1.jpg"  alt="Image 1"  loading="lazy">
     <img id="img2"  src="IMG_2.jpg"  alt="Image 2"  loading="lazy">
@@ -112,15 +199,64 @@
     <img id="img16" src="IMG_16.jpg" alt="Image 16" loading="lazy">
   </div>
 
-  <!-- Deep-link jump (e.g., photos.html#img6) -->
   <script>
-    window.addEventListener('load', () => {
-      const hash = window.location.hash;
-      if (hash) {
-        const el = document.querySelector(hash);
-        if (el) setTimeout(() => el.scrollIntoView({behavior:'auto', block:'start'}), 80);
+    // Collect the hidden images as our "playlist"
+    const imageNodes = Array.from(document.querySelectorAll('.gallery img'));
+    const displayImg = document.getElementById('current-photo');
+    const btnPrev = document.querySelector('.nav-arrow.left');
+    const btnNext = document.querySelector('.nav-arrow.right');
+
+    let currentIndex = 0;
+
+    function showImage(index) {
+      if (!imageNodes.length) return;
+
+      // Wrap index
+      if (index < 0) index = imageNodes.length - 1;
+      if (index >= imageNodes.length) index = 0;
+
+      currentIndex = index;
+
+      const srcImg = imageNodes[currentIndex];
+      displayImg.src = srcImg.src;
+      displayImg.alt = srcImg.alt || "";
+
+      // Keep hash in sync so photos.html#imgX still reflects current image
+      if (srcImg.id) {
+        history.replaceState(null, "", "#" + srcImg.id);
+      }
+    }
+
+    // Read initial from hash (photos.html#img6)
+    function initFromHash() {
+      const hash = window.location.hash.replace("#", "");
+      if (!hash) {
+        showImage(0);
+        return;
+      }
+      const idx = imageNodes.findIndex(img => img.id === hash);
+      if (idx >= 0) {
+        showImage(idx);
+      } else {
+        showImage(0);
+      }
+    }
+
+    // Arrows
+    btnPrev.addEventListener('click', () => showImage(currentIndex - 1));
+    btnNext.addEventListener('click', () => showImage(currentIndex + 1));
+
+    // Keyboard navigation (← →)
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') {
+        showImage(currentIndex - 1);
+      } else if (e.key === 'ArrowRight') {
+        showImage(currentIndex + 1);
       }
     });
+
+    window.addEventListener('load', initFromHash);
+    window.addEventListener('hashchange', initFromHash);
   </script>
 </body>
 </html>
