@@ -14,10 +14,11 @@ html, body {
 
 body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-
-  /* FULL-SCREEN BACKGROUND IMAGE
-     Change the file name whenever you want a new monthly background. */
-  background: #000 url("bg_01.jpg") center center / cover no-repeat fixed;
+  background-image: url("bg_01.jpg"); /* <- put your image file here */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;   /* stays still */
   color: #111;
 }
 
