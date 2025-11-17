@@ -6,7 +6,7 @@
   <title>marcoalexismaria</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-<body>
+<body class="fullscreen">
 
   <!-- Floating top-left title (clickable back to home) -->
   <div class="top-corner-title">
@@ -27,8 +27,8 @@
     </div>
   </div>
 
-  <!-- WHITE FULL-SCREEN PANEL -->
-  <main class="main-content">
+  <!-- FULLSCREEN BACKGROUND (image set by JS) + HORIZONTAL GALLERY -->
+  <main class="main-content" id="hero-background">
     <div class="gallery-frame">
       <div class="gallery-row">
         <!-- photos -->
@@ -64,21 +64,41 @@
   </footer>
 
   <script>
+    // Shuffle gallery items on load
     document.addEventListener("DOMContentLoaded", () => {
       const gallery = document.querySelector(".gallery-row");
       const items = Array.from(gallery.children);
-
-      // Fisher–Yates shuffle
       for (let i = items.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [items[i], items[j]] = [items[j], items[i]];
       }
-
       items.forEach(item => gallery.appendChild(item));
     });
+
+    // MONTHLY BACKGROUND IMAGE
+    // Put your 12 background images in /images or root and name them however you want
+    const monthBackgrounds = [
+      "bg_january.jpg",
+      "bg_february.jpg",
+      "bg_march.jpg",
+      "bg_april.jpg",
+      "bg_may.jpg",
+      "bg_june.jpg",
+      "bg_july.jpg",
+      "bg_august.jpg",
+      "bg_september.jpg",
+      "bg_october.jpg",
+      "bg_november.jpg",
+      "bg_december.jpg"
+    ];
+
+    const hero = document.getElementById("hero-background");
+    const monthIndex = new Date().getMonth(); // 0–11
+    const bgFile = monthBackgrounds[monthIndex];
+
+    // Only set if file exists in your project
+    hero.style.backgroundImage = `url('${bgFile}')`;
   </script>
 
 </body>
 </html>
-
-
