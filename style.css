@@ -1,24 +1,15 @@
-/* base */
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
+/* Basic page vibe */
 body {
   margin: 0;
-  padding: 0;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-  background: #111;           /* dark background, like the reference */
+  background: #000;              /* background can be whatever you already have */
   color: #111;
 }
 
-/* top corners */
-
+/* Top corner title + header – keep yours if you already styled them */
 .top-corner-title {
   position: fixed;
-  top: 18px;
+  top: 16px;
   left: 24px;
   font-size: 12px;
   letter-spacing: 0.08em;
@@ -28,84 +19,76 @@ body {
 
 .header {
   position: fixed;
-  top: 18px;
+  top: 16px;
   right: 24px;
   z-index: 10;
 }
 
-.header .links {
-  display: flex;
-  gap: 14px;
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.header a {
+.header .links a {
+  font-size: 12px;
+  margin-left: 16px;
   text-decoration: none;
   color: #111;
 }
 
-/* main centered frame */
-
-.frame-wrapper {
+/* Centered “poster” area like the reference */
+.main-content {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 60px 20px;    /* keeps room around the frame */
+  padding: 4rem 1.5rem;
+  box-sizing: border-box;
 }
 
-.frame {
-  background: #f7f6f2;   /* off-white interior, like the big rectangle in your ref */
+.gallery-frame {
   width: 100%;
-  max-width: 1200px;
-  min-height: 55vh;
-  border-radius: 4px;
-  box-shadow: 0 0 60px rgba(0, 0, 0, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  max-width: 1200px;      /* controls how wide the white strip is */
+  background: #f5f5f0;    /* off–white, like the reference */
+  padding: 4rem 3rem;
+  box-sizing: border-box;
 }
 
-/* gallery row */
-
+/* Horizontal scrolling row */
 .gallery-row {
   display: flex;
-  gap: 20px;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 40px;
-  max-width: 100%;
-  overflow-x: auto;   /* in case it gets tight on mobile */
+  gap: 1.5rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  padding-bottom: 0.5rem;       /* space to avoid cutting off scrollbar */
 }
 
-/* show up to 8 tiles */
-.gallery-row a:nth-child(n + 9) {
-  display: none;
+/* Hide scrollbar on WebKit (Chrome/Safari) – optional */
+.gallery-row::-webkit-scrollbar {
+  height: 6px;
+}
+.gallery-row::-webkit-scrollbar-track {
+  background: transparent;
+}
+.gallery-row::-webkit-scrollbar-thumb {
+  background: #ccc;
 }
 
-.gallery-row img {
-  display: block;
-  height: 220px;      /* controls how tall your thumbs are */
+/* Images */
+.gallery-row a img {
+  height: 260px;               /* adjust to taste */
   width: auto;
   object-fit: cover;
+  display: block;
 }
 
-/* footer */
+/* Video thumbs could be slightly different, if you want */
+.gallery-row a.video-thumb img {
+  height: 260px;
+}
 
+/* Footer */
 .footer {
   position: fixed;
-  bottom: 18px;
+  bottom: 16px;
   left: 50%;
   transform: translateX(-50%);
   font-size: 10px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #777;
 }
 
-.footer img {
-  height: 18px;
-  width: auto;
-}
