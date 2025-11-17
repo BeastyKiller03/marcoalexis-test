@@ -31,22 +31,24 @@ body {
   color: #111;
 }
 
-/* Centered “poster” area like the reference */
+/* MAIN FULL-SCREEN WHITE BACKGROUND */
 .main-content {
-  min-height: 100vh;
+  height: 100vh;               /* full screen */
+  width: 100%;
+  background: #faf9f6;         /* soft white, not pure white */
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 4rem 1.5rem;
-  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
 }
 
 .gallery-frame {
   width: 100%;
-  max-width: 1200px;      /* controls how wide the white strip is */
-  background: #f5f5f0;    /* off–white, like the reference */
-  padding: 4rem 3rem;
+  max-width: 1400px;           /* controls how wide the image strip spans */
+  padding: 0 40px;             /* small left/right breathing room */
   box-sizing: border-box;
+  background: transparent;     /* remove the white box appearance */
 }
 
 /* Horizontal scrolling row */
