@@ -1,183 +1,225 @@
-/* RESET / BASE */
+/* =========================
+   BASE / RESET
+   ========================= */
 *,
 *::before,
-*::after {
-  box-sizing: border-box;
-}
+*::after { box-sizing: border-box; }
 
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  overflow: hidden;                 /* no vertical scroll */
+  overflow: hidden; /* no vertical scroll */
 }
 
 body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-  background-image: url("bg_01.jpg"); /* <- put your image file here */
+  color: #111;
+
+  /* your background image */
+  background-image: url("bg_01.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  background-attachment: fixed;   /* stays still */
-  color: #111;
 }
 
-/* TOP-LEFT NAME */
-.top-corner-title {
+/* =========================
+   TOP BAR (DESKTOP)
+   ========================= */
+.top-bar{
   position: fixed;
   top: 16px;
   left: 24px;
-  z-index: 20;
+  right: 24px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  z-index: 30;
+}
+
+.top-corner-title{
   font-size: 12px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
-.top-corner-title a {
+.top-corner-title a{
   text-decoration: none;
   color: #111;
 }
 
-/* TOP-RIGHT MENU */
-.header {
-  position: fixed;
-  top: 16px;
-  right: 24px;
-  z-index: 20;
-}
-
-.header .links {
+.header .links{
   display: flex;
-  flex-wrap: wrap;                 /* allows wrapping on smaller screens */
-  justify-content: flex-end;
-  gap: 12px;
+  gap: 16px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
 }
 
-.header .links a {
+.header .links a{
   font-size: 12px;
   text-decoration: none;
   color: #111;
 }
 
-.header .links a:hover {
-  opacity: 0.6;
-}
+.header .links a:hover{ opacity: 0.6; }
 
-/* MAIN AREA – centered horizontally */
-.main-content {
+/* =========================
+   RED EMBLEM (DESKTOP)
+   ========================= */
+.red-square{
+  position: fixed;
+  top: 60px;     /* below the top-bar */
+  left: 24px;
+  width: 70px;
+  height: 70px;
+  background: #ff0033;
+  z-index: 25;
+  cursor: pointer;
+  transition: opacity .2s ease;
+}
+.red-square:hover{ opacity: .9; }
+
+/* =========================
+   MAIN + GALLERY
+   ========================= */
+.main-content{
   height: 100vh;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0 40px;
-  box-sizing: border-box;
 }
 
-.gallery-frame {
+.gallery-frame{
   width: 100%;
   max-width: 1200px;
 }
 
-/* HORIZONTAL SCROLL STRIP */
-.gallery-row {
+.gallery-row{
   display: flex;
   gap: 16px;
   overflow-x: auto;
   overflow-y: hidden;
   scroll-behavior: smooth;
-  padding-bottom: 8px;             /* space so scrollbar isn't cut off */
+  padding-bottom: 10px;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
+
+  /* nice snapping feel (optional but recommended) */
+  scroll-snap-type: x mandatory;
 }
 
-/* Super light horizontal scrollbar */
-.gallery-row::-webkit-scrollbar {
-  height: 4px;
+.gallery-row a{
+  scroll-snap-align: center;
 }
 
-.gallery-row::-webkit-scrollbar-track {
-  background: transparent;
+/* light scrollbar */
+.gallery-row::-webkit-scrollbar{ height: 4px; }
+.gallery-row::-webkit-scrollbar-track{ background: transparent; }
+.gallery-row::-webkit-scrollbar-thumb{
+  background: rgba(0,0,0,0.10);
+  border-radius: 6px;
+}
+.gallery-row:hover::-webkit-scrollbar-thumb{
+  background: rgba(0,0,0,0.18);
 }
 
-.gallery-row::-webkit-scrollbar-thumb {
-  background: rgba(0,0,0,0.08);
-  border-radius: 4px;
-}
-
-.gallery-row:hover::-webkit-scrollbar-thumb {
-  background: rgba(0,0,0,0.15);
-}
-
-/* Images in strip */
-.gallery-row a img {
+/* Desktop tile size */
+.gallery-row a img{
   height: 260px;
   width: auto;
-  object-fit: cover;
   display: block;
+  object-fit: cover;
 }
 
-/* Video thumbs same height so everything lines up */
-.gallery-row a.video-thumb img {
-  height: 260px;
-}
-
-/* FOOTER */
-.footer {
+/* Footer */
+.footer{
   position: fixed;
   bottom: 16px;
   left: 50%;
   transform: translateX(-50%);
   font-size: 10px;
-  z-index: 20;
+  z-index: 30;
 }
-
-.footer a {
-  text-decoration: none;
-  color: #111;
-}
+.footer a{ text-decoration: none; color: #111; }
 
 /* =========================
-   MOBILE TWEAKS
+   MOBILE FIXES (≤ 768px)
+   - stack header
+   - shrink emblem
+   - make images bigger
+   - keep NO vertical scrolling
    ========================= */
+@media (max-width: 768px){
 
-@media (max-width: 768px) {
-  /* allow slight vertical scroll if needed so menu doesn't clash with footer */
-  html, body {
-    overflow-y: hidden;         /* keep no vertical scroll if you want it strict */
-  }
-
-  .top-corner-title {
-    top: 10px;
-    left: 12px;
-    font-size: 11px;
-  }
-
-  .header {
-    top: 34px;
-    right: 12px;
-    left: 12px;
-  }
-
-  .header .links {
+  /* Stack the header so it never overlaps */
+  .top-bar{
+    top: 14px;
+    left: 16px;
+    right: 16px;
+    flex-direction: column;
+    align-items: flex-start;
     justify-content: flex-start;
-    gap: 8px;
+    gap: 10px;
   }
 
-  .header .links a {
+  /* Menu becomes a horizontal row that can scroll if needed */
+  .header{
+    width: 100%;
+  }
+
+  .header .links{
+    width: 100%;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 14px;
+    padding-bottom: 6px;
+  }
+
+  /* hide the menu scrollbar on mobile */
+  .header .links::-webkit-scrollbar{ display: none; }
+  .header .links{ scrollbar-width: none; }
+
+  /* Make the red square smaller so it doesn't compress anything */
+  .red-square{
+    top: 78px;     /* below stacked header */
+    left: 16px;
+    width: 46px;
+    height: 46px;
+  }
+
+  /* Center the gallery on screen and make tiles larger */
+  .main-content{
+    padding: 0; /* full bleed */
+  }
+
+  .gallery-frame{
+    max-width: 100%;
+  }
+
+  .gallery-row{
+    padding: 0 16px 10px 16px;
+    gap: 14px;
+  }
+
+  /* 3 items can “fit the screen” as a layout target,
+     but still allow swipe. This makes them BIGGER. */
+  .gallery-row a{
+    flex: 0 0 calc((100vw - 16px - 16px - (14px * 2)) / 3);
+  }
+
+  .gallery-row a img{
+    width: 100%;
+    height: 180px;  /* bigger than your current mobile look */
+    object-fit: cover;
+  }
+
+  .footer{
+    bottom: 12px;
     font-size: 10px;
   }
-
-  .main-content {
-    padding: 0 16px;
-  }
-
-  .gallery-row a img,
-  .gallery-row a.video-thumb img {
-    height: 150px;          /* smaller images so you see them fully */
-  }
-
-  .footer {
-    bottom: 10px;
-    font-size: 9px;
-  }
 }
-
