@@ -14,13 +14,13 @@
       margin: 0;
       padding: 0;
       height: 100%;
-      overflow: hidden; /* no scroll */
+      overflow: hidden; /* no vertical scroll */
       background: #faf9f6;
       color: #111;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
     }
 
-    /* ===== TOP BAR (matches index layout) ===== */
+    /* ===== TOP BAR (same style as your current photos page) ===== */
     .top-bar{
       position: fixed;
       top: 16px;
@@ -30,16 +30,14 @@
       align-items: center;
       justify-content: space-between;
       z-index: 1000;
-      pointer-events: none; /* so the viewer can still be clicked */
     }
-
-    .top-bar a { pointer-events: auto; } /* re-enable clicks for links */
 
     .top-corner-title{
       font-size: 12px;
       letter-spacing: 0.08em;
       text-transform: uppercase;
       line-height: 1;
+      white-space: nowrap;
     }
 
     .top-corner-title a{
@@ -47,12 +45,11 @@
       color: inherit;
     }
 
-    /* Menu styling (keeps your .header/.links structure but prevents weird shifts) */
     .header .links{
       display: flex;
       align-items: center;
       gap: 16px;
-      flex-wrap: nowrap;
+      flex-wrap: wrap; /* mobile wrap */
       justify-content: flex-end;
     }
 
@@ -61,75 +58,69 @@
       text-decoration: none;
       color: inherit;
       line-height: 1;
+      white-space: nowrap;
     }
 
-    .header .links a:hover{
-      opacity: 0.6;
-    }
+    .header .links a:hover{ opacity: 0.6; }
 
-    /* ===== VIEWER ===== */
-    .viewer{
-      position: relative;
+    /* ===== GALLERY STAGE ===== */
+    .stage{
       height: 100vh;
       width: 100vw;
       display: grid;
       place-items: center;
-      background: #faf9f6;
-      padding: 72px 80px 40px; /* top padding accounts for fixed top-bar */
-      overflow: hidden;
+      padding: 78px 24px 28px; /* room for top bar */
+      box-sizing: border-box;
     }
 
-    .viewer img{
-      max-width: min(calc(100vw - 160px), 1200px);
-      max-height: min(calc(100vh - 140px), 82vh);
-      object-fit: contain;
-      display: block;
-      border-radius: 4px;
-      box-shadow: 0 0 12px rgba(0,0,0,0.14);
+    /* Horizontal rail */
+    .rail{
+      width: min(1240px, 100%);
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-behavior: smooth;
+      scroll-snap-type: x mandatory;
+      padding: 10px 8px 18px;
+      -webkit-overflow-scrolling: touch;
     }
 
-    /* ===== CLEAN ARROWS ===== */
-    .nav-arrow{
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 44px;
-      height: 44px;
+    /* subtle scrollbar */
+    .rail::-webkit-scrollbar{ height: 4px; }
+    .rail::-webkit-scrollbar-track{ background: transparent; }
+    .rail::-webkit-scrollbar-thumb{
+      background: rgba(0,0,0,0.10);
       border-radius: 999px;
-      border: 1px solid rgba(0,0,0,0.10);
-      background: rgba(255,255,255,0.55);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-      display: grid;
-      place-items: center;
-      cursor: pointer;
-      transition: opacity 0.15s ease, transform 0.15s ease, background 0.15s ease;
-      opacity: 0.6;
-      z-index: 900;
-      padding: 0;
+    }
+    .rail:hover::-webkit-scrollbar-thumb{
+      background: rgba(0,0,0,0.18);
     }
 
-    .nav-arrow:hover{
-      opacity: 1;
-      background: rgba(255,255,255,0.75);
-      transform: translateY(-50%) scale(1.03);
-    }
-
-    .nav-arrow:active{
-      transform: translateY(-50%) scale(0.98);
-    }
-
-    .nav-arrow svg{
-      width: 18px;
-      height: 18px;
+    .card{
+      flex: 0 0 auto;
+      scroll-snap-align: center;
+      text-decoration: none;
       display: block;
     }
 
-    .nav-arrow.left{ left: 24px; }
-    .nav-arrow.right{ right: 24px; }
+    /* Photo sizing */
+    .card img{
+      height: 72vh;
+      max-height: 720px;
+      width: auto;
+      display: block;
+      object-fit: contain;
+      border-radius: 6px;
+      box-shadow: 0 0 14px rgba(0,0,0,0.14);
+      transition: transform .18s ease, opacity .18s ease;
+      background: #faf9f6;
+    }
 
-    /* Hide source list */
-    .gallery{ display: none; }
+    .card:hover img{
+      transform: translateY(-2px);
+      opacity: .97;
+    }
 
     /* ===== MOBILE ===== */
     @media (max-width: 768px){
@@ -141,36 +132,41 @@
 
       .header .links{
         gap: 10px;
-        flex-wrap: wrap;           /* if needed, wraps instead of colliding */
-        justify-content: flex-end;
       }
 
       .header .links a{
         font-size: 11px;
       }
 
-      .viewer{
-        padding: 86px 18px 22px;   /* more top space so wrapped menu doesn't overlap photo */
+      .stage{
+        padding: 92px 10px 22px; /* extra top room if menu wraps */
       }
 
-      .viewer img{
-        max-width: 92vw;
-        max-height: 72vh;
+      .rail{
+        gap: 12px;
+        padding: 8px 10px 14px;
       }
 
-      .nav-arrow{
-        width: 40px;
-        height: 40px;
+      /* On mobile, show ~1 image per snap (clean swipe) */
+      .card{
+        flex: 0 0 88vw;
       }
 
-      .nav-arrow.left{ left: 10px; }
-      .nav-arrow.right{ right: 10px; }
+      .card img{
+        width: 100%;
+        height: 62vh;
+        max-height: none;
+        object-fit: cover; /* looks better on phone */
+      }
+
+      .rail::-webkit-scrollbar{ display: none; }
+      .rail{ scrollbar-width: none; }
     }
   </style>
 </head>
 
 <body>
-  <!-- TOP BAR: name + menu (same layout concept as index) -->
+  <!-- TOP BAR -->
   <header class="top-bar">
     <div class="top-corner-title">
       <a href="index.html">Marco Maria</a>
@@ -187,87 +183,47 @@
     </div>
   </header>
 
-  <!-- Viewer -->
-  <div class="viewer">
-    <button class="nav-arrow left" aria-label="Previous photo">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-      </svg>
-    </button>
+  <!-- HORIZONTAL SCROLL GALLERY -->
+  <main class="stage">
+    <section class="rail" id="rail">
 
-    <img id="current-photo" src="IMG_1.jpg" alt="">
+      <a class="card" href="#img1"><img id="img1"  src="photos/IMG_1.jpg"  alt="Image 1"  loading="lazy"></a>
+      <a class="card" href="#img2"><img id="img2"  src="photos/IMG_2.jpg"  alt="Image 2"  loading="lazy"></a>
+      <a class="card" href="#img3"><img id="img3"  src="photos/IMG_3.jpg"  alt="Image 3"  loading="lazy"></a>
+      <a class="card" href="#img4"><img id="img4"  src="photos/IMG_4.jpg"  alt="Image 4"  loading="lazy"></a>
+      <a class="card" href="#img5"><img id="img5"  src="photos/IMG_5.jpg"  alt="Image 5"  loading="lazy"></a>
+      <a class="card" href="#img6"><img id="img6"  src="photos/IMG_6.jpg"  alt="Image 6"  loading="lazy"></a>
+      <a class="card" href="#img7"><img id="img7"  src="photos/IMG_7.jpg"  alt="Image 7"  loading="lazy"></a>
+      <a class="card" href="#img8"><img id="img8"  src="photos/IMG_8.jpg"  alt="Image 8"  loading="lazy"></a>
+      <a class="card" href="#img9"><img id="img9"  src="photos/IMG_9.jpg"  alt="Image 9"  loading="lazy"></a>
+      <a class="card" href="#img10"><img id="img10" src="photos/IMG_10.jpg" alt="Image 10" loading="lazy"></a>
+      <a class="card" href="#img11"><img id="img11" src="photos/IMG_11.jpg" alt="Image 11" loading="lazy"></a>
+      <a class="card" href="#img12"><img id="img12" src="photos/IMG_12.jpg" alt="Image 12" loading="lazy"></a>
+      <a class="card" href="#img13"><img id="img13" src="photos/IMG_13.jpg" alt="Image 13" loading="lazy"></a>
+      <a class="card" href="#img14"><img id="img14" src="photos/IMG_14.jpg" alt="Image 14" loading="lazy"></a>
+      <a class="card" href="#img15"><img id="img15" src="photos/IMG_15.jpg" alt="Image 15" loading="lazy"></a>
+      <a class="card" href="#img16"><img id="img16" src="photos/IMG_16.jpg" alt="Image 16" loading="lazy"></a>
 
-    <button class="nav-arrow right" aria-label="Next photo">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-      </svg>
-    </button>
-  </div>
-
-  <!-- Hidden source list -->
-  <div class="gallery">
-    <img id="img1"  src="photos/IMG_1.jpg"  alt="Image 1"  loading="lazy">
-    <img id="img2"  src="photos/IMG_2.jpg"  alt="Image 2"  loading="lazy">
-    <img id="img3"  src="photos/IMG_3.jpg"  alt="Image 3"  loading="lazy">
-    <img id="img4"  src="photos/IMG_4.jpg"  alt="Image 4"  loading="lazy">
-    <img id="img5"  src="photos/IMG_5.jpg"  alt="Image 5"  loading="lazy">
-    <img id="img6"  src="photos/IMG_6.jpg"  alt="Image 6"  loading="lazy">
-    <img id="img7"  src="photos/IMG_7.jpg"  alt="Image 7"  loading="lazy">
-    <img id="img8"  src="photos/IMG_8.jpg"  alt="Image 8"  loading="lazy">
-    <img id="img9"  src="photos/IMG_9.jpg"  alt="Image 9"  loading="lazy">
-    <img id="img10" src="photos/IMG_10.jpg" alt="Image 10" loading="lazy">
-    <img id="img11" src="photos/IMG_11.jpg" alt="Image 11" loading="lazy">
-    <img id="img12" src="photos/IMG_12.jpg" alt="Image 12" loading="lazy">
-    <img id="img13" src="photos/IMG_13.jpg" alt="Image 13" loading="lazy">
-    <img id="img14" src="photos/IMG_14.jpg" alt="Image 14" loading="lazy">
-    <img id="img15" src="photos/IMG_15.jpg" alt="Image 15" loading="lazy">
-    <img id="img16" src="photos/IMG_16.jpg" alt="Image 16" loading="lazy">
-  </div>
+    </section>
+  </main>
 
   <script>
-    const imageNodes = Array.from(document.querySelectorAll(".gallery img"));
-    const displayImg = document.getElementById("current-photo");
-    const btnPrev = document.querySelector(".nav-arrow.left");
-    const btnNext = document.querySelector(".nav-arrow.right");
-    let currentIndex = 0;
+    // If someone visits photos.html#img10, scroll that image into view
+    function scrollToHash() {
+      const id = window.location.hash.replace("#", "");
+      if (!id) return;
 
-    function showImage(index) {
-      if (!imageNodes.length) return;
-
-      if (index < 0) index = imageNodes.length - 1;
-      if (index >= imageNodes.length) index = 0;
-
-      currentIndex = index;
-
-      const srcImg = imageNodes[currentIndex];
-      displayImg.src = srcImg.src;
-      displayImg.alt = srcImg.alt || "";
-
-      if (srcImg.id) history.replaceState(null, "", "#" + srcImg.id);
+      const el = document.getElementById(id);
+      if (el) {
+        // slight delay so layout is ready
+        setTimeout(() => {
+          el.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+        }, 60);
+      }
     }
 
-    function initFromHash() {
-      const hash = window.location.hash.replace("#", "");
-      if (!hash) return showImage(0);
-
-      const idx = imageNodes.findIndex(img => img.id === hash);
-      showImage(idx >= 0 ? idx : 0);
-    }
-
-    btnPrev.addEventListener("click", () => showImage(currentIndex - 1));
-    btnNext.addEventListener("click", () => showImage(currentIndex + 1));
-
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "ArrowLeft") showImage(currentIndex - 1);
-      if (e.key === "ArrowRight") showImage(currentIndex + 1);
-    });
-
-    window.addEventListener("load", initFromHash);
-    window.addEventListener("hashchange", initFromHash);
+    window.addEventListener("load", scrollToHash);
+    window.addEventListener("hashchange", scrollToHash);
   </script>
 </body>
 </html>
-
-
-
-
