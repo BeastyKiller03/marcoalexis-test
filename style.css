@@ -1,48 +1,62 @@
-/* ===== Base ===== */
-* { box-sizing: border-box; }
+/* =========================
+   BASE / RESET
+========================= */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  overflow: hidden;              /* no vertical scroll */
+  overflow: hidden; /* lock page: no vertical scroll */
 }
 
 body{
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
   color: #111;
 
-  /* background image replaces the old white panel */
+  /* Background replaces white panel */
   background-image: url("bg_01.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 }
 
-/* subtle “veil” so text reads cleanly over any background */
+/* soft veil so text is readable over any bg */
 body::before{
   content:"";
   position: fixed;
   inset: 0;
   background: rgba(255,255,255,0.72);
   pointer-events: none;
+  z-index: 0; /* IMPORTANT: sits behind everything */
 }
 
-/* ===== Top bar ===== */
+/* ensure all main UI sits above veil */
+.topbar, .stage, .foot { position: relative; z-index: 1; }
+
+/* =========================
+   TOP BAR (DESKTOP/TABLET)
+========================= */
 .topbar{
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
+
   padding: calc(16px + env(safe-area-inset-top)) 24px 10px 24px;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
+
+  display: grid;
+  grid-template-columns: auto 1fr; /* brand on left, nav on right */
+  align-items: start;
+  column-gap: 18px;
+
   z-index: 20;
 }
 
+/* Brand block (name + emblem) */
 .brand{
-  position: relative;
   display: inline-flex;
   flex-direction: column;
   gap: 10px;
@@ -54,9 +68,10 @@ body::before{
   text-transform: uppercase;
   text-decoration: none;
   color: #111;
+  white-space: nowrap;
 }
 
-/* Red square “emblem” */
+/* Red emblem square */
 .emblem{
   width: 58px;
   height: 58px;
@@ -64,19 +79,24 @@ body::before{
   background: #ff0033;
   cursor: pointer;
   padding: 0;
-  transition: transform .18s ease, opacity .18s ease;
+  border-radius: 0; /* keep it sharp like your reference */
   box-shadow: 0 8px 18px rgba(0,0,0,0.10);
+  transition: transform .18s ease, opacity .18s ease;
 }
 .emblem:hover{ opacity: .92; transform: translateY(-1px); }
 .emblem:active{ transform: translateY(0px) scale(.98); }
 
+/* Nav links */
 .nav{
+  justify-self: end;
   display: flex;
   align-items: center;
   justify-content: flex-end;
   flex-wrap: wrap;
   gap: 12px 16px;
-  max-width: 62vw;
+
+  /* Prevents overlap by keeping nav inside available space */
+  max-width: 100%;
 }
 
 .nav a{
@@ -88,33 +108,35 @@ body::before{
 }
 .nav a:hover{ opacity: .6; }
 
-/* ===== Stage / gallery ===== */
+/* =========================
+   STAGE / GALLERY STRIP
+========================= */
 .stage{
-  position: relative;
   height: 100vh;
   width: 100vw;
   display: grid;
   place-items: center;
-  padding: 90px 24px 64px 24px; /* room for topbar + footer */
-  z-index: 1;
+
+  /* room for fixed topbar + footer */
+  padding: 96px 24px 64px 24px;
 }
 
-/* Horizontal rail */
 .rail{
   width: min(1240px, 100%);
   display: flex;
   gap: 16px;
+
   overflow-x: auto;
   overflow-y: hidden;
+
   scroll-behavior: smooth;
   scroll-snap-type: x mandatory;
-  padding: 12px 8px 18px 8px;
 
-  /* lets it feel like a “wheel” */
+  padding: 12px 8px 18px 8px;
   -webkit-overflow-scrolling: touch;
 }
 
-/* subtle scrollbar */
+/* subtle scrollbar (desktop) */
 .rail::-webkit-scrollbar{ height: 4px; }
 .rail::-webkit-scrollbar-track{ background: transparent; }
 .rail::-webkit-scrollbar-thumb{
@@ -125,7 +147,7 @@ body::before{
   background: rgba(0,0,0,0.18);
 }
 
-/* Cards */
+/* cards */
 .card{
   flex: 0 0 auto;
   scroll-snap-align: center;
@@ -133,9 +155,7 @@ body::before{
   display: block;
 }
 
-/* Images:
-   desktop: nice “photography site” height
-*/
+/* image sizing (desktop) */
 .card img{
   height: 260px;
   width: auto;
@@ -147,7 +167,9 @@ body::before{
 }
 .card:hover img{ transform: translateY(-2px); opacity: .96; }
 
-/* ===== Footer ===== */
+/* =========================
+   FOOTER
+========================= */
 .foot{
   position: fixed;
   bottom: calc(14px + env(safe-area-inset-bottom));
@@ -155,55 +177,55 @@ body::before{
   right: 0;
   text-align: center;
   z-index: 20;
+
   font-size: 11px;
   letter-spacing: 0.04em;
 }
 .foot a{ color: #111; text-decoration: none; opacity: .9; }
 .foot a:hover{ opacity: .6; }
 
-/* ===== Mobile: 3 images visible, no overlap ===== */
+/* =========================
+   MOBILE FIXES (NO OVERLAP)
+   - key: stack nav under brand on very small screens
+   - keep 3 images visible in rail
+========================= */
 @media (max-width: 768px){
   .topbar{
     padding: calc(14px + env(safe-area-inset-top)) 16px 8px 16px;
-    gap: 12px;
+    column-gap: 12px;
   }
 
-  .brand-name{ font-size: 12px; }
-
-  /* smaller emblem so it doesn’t crush the header */
   .emblem{
     width: 44px;
     height: 44px;
   }
 
-  /* keep menu readable and aligned */
   .nav{
-    max-width: 58vw;
     gap: 10px 12px;
   }
+
   .nav a{
     font-size: 12px;
     letter-spacing: 0.01em;
   }
 
-  /* center the gallery visually */
   .stage{
-    padding: 92px 10px 62px 10px;
+    padding: 98px 10px 62px 10px;
   }
 
-  /* 3-up visible: each card is ~31vw (plus gaps) */
+  /* 3-up visible */
   .rail{
     gap: 12px;
     padding: 10px 10px 14px 10px;
   }
 
   .card{
-    flex: 0 0 31vw;
+    flex: 0 0 31vw; /* ~3 cards across */
   }
 
   .card img{
     width: 100%;
-    height: 28vh;               /* fills the screen more */
+    height: 28vh;     /* fills screen more */
     min-height: 190px;
     max-height: 260px;
     object-fit: cover;
@@ -211,4 +233,21 @@ body::before{
 
   /* hide scrollbar on mobile */
   .rail::-webkit-scrollbar{ display: none; }
+}
+
+/* Extra small phones: STOP name/menu collision completely */
+@media (max-width: 420px){
+  .topbar{
+    grid-template-columns: 1fr; /* stack */
+    row-gap: 10px;
+  }
+
+  .nav{
+    justify-self: start;        /* menu sits under name */
+    justify-content: flex-start;
+  }
+
+  .stage{
+    padding-top: 112px; /* extra space because header is now 2 rows */
+  }
 }
