@@ -17,26 +17,25 @@
       background: #faf9f6;
       color: #111;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-      overflow: hidden;
     }
 
-    /* IMPORTANT: prevent index bg/veil from affecting this page */
+    /* prevent index background/veil */
     body::before { display: none !important; }
     body { background-image: none !important; }
 
-    /* ===== TOP BAR (ONE ROW) ===== */
+    /* ===== TOP BAR ===== */
     .top-bar{
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
-      padding: calc(12px + env(safe-area-inset-top)) 16px 10px 16px;
+      padding: calc(12px + env(safe-area-inset-top)) 16px 10px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 14px;
       z-index: 1000;
-      background: #faf9f6; /* keeps it clean like your screenshot */
+      background: #faf9f6;
     }
 
     .brand{
@@ -44,30 +43,24 @@
       letter-spacing: 0.10em;
       text-transform: lowercase;
       white-space: nowrap;
-      line-height: 1;
-      flex: 0 0 auto;
     }
+
     .brand a{
       text-decoration: none;
       color: inherit;
     }
-    .brand a:hover{ opacity: .6; }
 
-    /* menu stays on the right */
     .menu{
-      flex: 1 1 auto;
+      flex: 1;
       display: flex;
       justify-content: flex-end;
-      min-width: 0; /* allows overflow scrolling */
+      min-width: 0;
     }
 
     .menu .links{
       display: flex;
       gap: 16px;
-      align-items: center;
       white-space: nowrap;
-
-      /* key: scroll instead of wrap/squeeze */
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
@@ -75,32 +68,27 @@
     .menu .links::-webkit-scrollbar{ display: none; }
 
     .menu .links a{
-      font-size: 13px;          /* matches your screenshot more */
+      font-size: 13px;
       text-decoration: none;
       color: inherit;
       opacity: .92;
-      line-height: 1;
     }
-    .menu .links a:hover{ opacity: .6; }
 
     /* ===== MAIN ===== */
     .music-wrapper{
-      height: 100vh;
-      width: 100vw;
+      min-height: 100vh;
+      padding: calc(72px + env(safe-area-inset-top)) 16px 40px;
       display: flex;
-      align-items: center;
       justify-content: center;
-
-      /* smaller top padding so content sits higher (fixes the empty space) */
-      padding: calc(64px + env(safe-area-inset-top)) 0 26px;
     }
 
-    /* Desktop: 3-up */
+    /* Desktop: horizontal row */
     .album-row{
       display: flex;
       gap: 32px;
       align-items: center;
       justify-content: center;
+      flex-wrap: nowrap;
     }
 
     .album{
@@ -117,7 +105,6 @@
       border-radius: 16px;
       box-shadow: 0 14px 28px rgba(0,0,0,0.14);
       display: block;
-      background: #eee;
     }
 
     .album span{
@@ -135,40 +122,34 @@
       opacity: .96;
     }
 
-    /* ===== MOBILE: big swipe covers, NO compression ===== */
+    /* ===== MOBILE: VERTICAL STACK ===== */
     @media (max-width: 768px){
+
+      html, body {
+        overflow-y: auto;
+      }
+
       .music-wrapper{
-        align-items: flex-start; /* puts album closer to top like your screenshot */
-        padding: calc(70px + env(safe-area-inset-top)) 0 18px;
+        padding-top: calc(84px + env(safe-area-inset-top));
       }
 
       .album-row{
+        flex-direction: column;
+        gap: 28px;
         width: 100%;
-        overflow-x: auto;
-        overflow-y: hidden;
-        -webkit-overflow-scrolling: touch;
-        scroll-snap-type: x mandatory;
-
-        gap: 16px;
-        padding: 0 16px 14px;
-        justify-content: flex-start;
+        align-items: center;
       }
-      .album-row::-webkit-scrollbar{ display: none; }
 
       .album{
-        flex: 0 0 86vw;         /* big like your screenshot */
-        scroll-snap-align: center;
+        width: 100%;
+        max-width: 420px;
       }
 
       .album img{
         width: 100%;
-        height: 86vw;           /* square cover */
-        max-height: 420px;
+        height: auto;
+        aspect-ratio: 1 / 1;
         border-radius: 18px;
-      }
-
-      .album span{
-        margin-top: 10px;
       }
     }
   </style>
@@ -200,21 +181,21 @@
       <a class="album"
          href="https://soundcloud.com/marco-maria-638714703/sets/taped"
          target="_blank" rel="noopener">
-        <img src="cover/taped_cover.jpg" alt="TAPED cover" loading="lazy">
+        <img src="cover/taped_cover.jpg" alt="TAPED cover">
         <span>TAPED</span>
       </a>
 
       <a class="album"
          href="https://soundcloud.com/prince-marco-278939286/sets/emp"
          target="_blank" rel="noopener">
-        <img src="cover/emp_cover.jpg" alt="EMP cover" loading="lazy">
+        <img src="cover/emp_cover.jpg" alt="EMP cover">
         <span>EMP</span>
       </a>
 
       <a class="album"
          href="https://soundcloud.com/prince-marco-278939286/ang3l"
          target="_blank" rel="noopener">
-        <img src="cover/ang3l_cover.jpg" alt="ANG3L cover" loading="lazy">
+        <img src="cover/ang3l_cover.jpg" alt="ANG3L cover">
         <span>ANG3L</span>
       </a>
 
