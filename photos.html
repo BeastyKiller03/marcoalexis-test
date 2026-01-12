@@ -3,227 +3,250 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Photos - Marco Maria</title>
+  <title>Photographs – marcoalexismaria</title>
 
-  <!-- Uses the same global CSS as index -->
+  <!-- Keep your global CSS (for consistent fonts / vibe) -->
   <link rel="stylesheet" href="style.css" />
 
   <style>
     /* Page base */
-    html, body {
+    html, body{
       margin: 0;
       padding: 0;
-      height: 100%;
-      overflow: hidden; /* no vertical scroll */
       background: #faf9f6;
       color: #111;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+      overflow-x: hidden;
     }
 
-    /* ===== TOP BAR (same style as your current photos page) ===== */
-    .top-bar{
-      position: fixed;
-      top: 16px;
-      left: 24px;
-      right: 24px;
+    /* --- Top bar (same idea as your index: left name, right menu) --- */
+    .topbar{
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      padding: calc(14px + env(safe-area-inset-top)) 16px 12px 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      z-index: 1000;
+      gap: 12px;
+      background: rgba(250,249,246,0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
     }
 
-    .top-corner-title{
+    .brand-name{
       font-size: 12px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      line-height: 1;
+      letter-spacing: 0.10em;
+      text-transform: lowercase; /* matches your screenshot vibe */
+      text-decoration: none;
+      color: #111;
       white-space: nowrap;
     }
 
-    .top-corner-title a{
-      text-decoration: none;
-      color: inherit;
-    }
-
-    .header .links{
+    .nav{
       display: flex;
+      gap: 14px;
+      flex-wrap: nowrap;
       align-items: center;
-      gap: 16px;
-      flex-wrap: wrap; /* mobile wrap */
       justify-content: flex-end;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      max-width: 70vw;
     }
+    .nav::-webkit-scrollbar{ display:none; }
 
-    .header .links a{
+    .nav a{
       font-size: 12px;
       text-decoration: none;
-      color: inherit;
-      line-height: 1;
+      color: #111;
+      opacity: .92;
       white-space: nowrap;
     }
+    .nav a:hover{ opacity: .6; }
 
-    .header .links a:hover{ opacity: 0.6; }
+    /* --- Gallery grid (UP Photographers-ish) --- */
+    .wrap{
+      width: min(1200px, 100%);
+      margin: 0 auto;
+      padding: 18px 16px 28px 16px;
+    }
 
-    /* ===== GALLERY STAGE ===== */
-    .stage{
-      height: 100vh;
-      width: 100vw;
+    .grid{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      align-items: start;
+    }
+
+    .thumb{
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      border-radius: 10px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.65);
+      box-shadow: 0 10px 22px rgba(0,0,0,0.08);
+      transition: transform .16s ease, opacity .16s ease;
+      cursor: zoom-in;
+    }
+
+    .thumb:hover{
+      transform: translateY(-2px);
+      opacity: .98;
+    }
+
+    .thumb img{
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* --- Lightbox (click = “closer”) --- */
+    .lightbox{
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(250,249,246,0.92);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+    }
+    .lightbox.open{ display: flex; }
+
+    .lightbox-inner{
+      width: min(1100px, 100%);
+      max-height: calc(100vh - 36px);
       display: grid;
       place-items: center;
-      padding: 78px 24px 28px; /* room for top bar */
-      box-sizing: border-box;
+      position: relative;
     }
 
-    /* Horizontal rail */
-    .rail{
-      width: min(1240px, 100%);
-      display: flex;
-      gap: 16px;
-      overflow-x: auto;
-      overflow-y: hidden;
-      scroll-behavior: smooth;
-      scroll-snap-type: x mandatory;
-      padding: 10px 8px 18px;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    /* subtle scrollbar */
-    .rail::-webkit-scrollbar{ height: 4px; }
-    .rail::-webkit-scrollbar-track{ background: transparent; }
-    .rail::-webkit-scrollbar-thumb{
-      background: rgba(0,0,0,0.10);
-      border-radius: 999px;
-    }
-    .rail:hover::-webkit-scrollbar-thumb{
-      background: rgba(0,0,0,0.18);
-    }
-
-    .card{
-      flex: 0 0 auto;
-      scroll-snap-align: center;
-      text-decoration: none;
-      display: block;
-    }
-
-    /* Photo sizing */
-    .card img{
-      height: 72vh;
-      max-height: 720px;
+    .lightbox img{
+      max-width: 100%;
+      max-height: calc(100vh - 80px);
       width: auto;
-      display: block;
-      object-fit: contain;
-      border-radius: 6px;
-      box-shadow: 0 0 14px rgba(0,0,0,0.14);
-      transition: transform .18s ease, opacity .18s ease;
-      background: #faf9f6;
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.18);
+      transform: scale(0.98);
+      animation: pop .14s ease forwards;
+      cursor: zoom-out;
     }
 
-    .card:hover img{
-      transform: translateY(-2px);
-      opacity: .97;
+    @keyframes pop{
+      to { transform: scale(1); }
     }
 
-    /* ===== MOBILE ===== */
-    @media (max-width: 768px){
-      .top-bar{
-        top: 14px;
-        left: 14px;
-        right: 14px;
-      }
+    .close-hint{
+      position: absolute;
+      top: -6px;
+      right: 2px;
+      font-size: 12px;
+      letter-spacing: .04em;
+      opacity: .65;
+      user-select: none;
+      pointer-events: none;
+    }
 
-      .header .links{
-        gap: 10px;
-      }
-
-      .header .links a{
-        font-size: 11px;
-      }
-
-      .stage{
-        padding: 92px 10px 22px; /* extra top room if menu wraps */
-      }
-
-      .rail{
-        gap: 12px;
-        padding: 8px 10px 14px;
-      }
-
-      /* On mobile, show ~1 image per snap (clean swipe) */
-      .card{
-        flex: 0 0 88vw;
-      }
-
-      .card img{
-        width: 100%;
-        height: 62vh;
-        max-height: none;
-        object-fit: cover; /* looks better on phone */
-      }
-
-      .rail::-webkit-scrollbar{ display: none; }
-      .rail{ scrollbar-width: none; }
+    /* Mobile tweaks */
+    @media (max-width: 520px){
+      .brand-name{ font-size: 11px; }
+      .nav a{ font-size: 11px; }
+      .grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
   </style>
 </head>
 
 <body>
-  <!-- TOP BAR -->
-  <header class="top-bar">
-    <div class="top-corner-title">
-      <a href="index.html">Marco Maria</a>
-    </div>
 
-    <div class="header">
-      <div class="links">
-        <a href="videos.html">Videos</a>
-        <a href="music.html">Music</a>
-        <a href="photos.html">Photographs</a>
-        <a href="events.html">Events</a>
-        <a href="background.html">About</a>
-      </div>
-    </div>
+  <!-- Top bar -->
+  <header class="topbar">
+    <a class="brand-name" href="index.html">marcoalexismaria</a>
+
+    <nav class="nav" aria-label="Site navigation">
+      <a href="videos.html">Videos</a>
+      <a href="music.html">Music</a>
+      <a href="photos.html">Photographs</a>
+      <a href="events.html">Events</a>
+      <a href="background.html">About</a>
+    </nav>
   </header>
 
-  <!-- HORIZONTAL SCROLL GALLERY -->
-  <main class="stage">
-    <section class="rail" id="rail">
+  <!-- Gallery -->
+  <main class="wrap">
+    <section class="grid" aria-label="Photographs grid">
 
-      <a class="card" href="#img1"><img id="img1"  src="photos/IMG_1.jpg"  alt="Image 1"  loading="lazy"></a>
-      <a class="card" href="#img2"><img id="img2"  src="photos/IMG_2.jpg"  alt="Image 2"  loading="lazy"></a>
-      <a class="card" href="#img3"><img id="img3"  src="photos/IMG_3.jpg"  alt="Image 3"  loading="lazy"></a>
-      <a class="card" href="#img4"><img id="img4"  src="photos/IMG_4.jpg"  alt="Image 4"  loading="lazy"></a>
-      <a class="card" href="#img5"><img id="img5"  src="photos/IMG_5.jpg"  alt="Image 5"  loading="lazy"></a>
-      <a class="card" href="#img6"><img id="img6"  src="photos/IMG_6.jpg"  alt="Image 6"  loading="lazy"></a>
-      <a class="card" href="#img7"><img id="img7"  src="photos/IMG_7.jpg"  alt="Image 7"  loading="lazy"></a>
-      <a class="card" href="#img8"><img id="img8"  src="photos/IMG_8.jpg"  alt="Image 8"  loading="lazy"></a>
-      <a class="card" href="#img9"><img id="img9"  src="photos/IMG_9.jpg"  alt="Image 9"  loading="lazy"></a>
-      <a class="card" href="#img10"><img id="img10" src="photos/IMG_10.jpg" alt="Image 10" loading="lazy"></a>
-      <a class="card" href="#img11"><img id="img11" src="photos/IMG_11.jpg" alt="Image 11" loading="lazy"></a>
-      <a class="card" href="#img12"><img id="img12" src="photos/IMG_12.jpg" alt="Image 12" loading="lazy"></a>
-      <a class="card" href="#img13"><img id="img13" src="photos/IMG_13.jpg" alt="Image 13" loading="lazy"></a>
-      <a class="card" href="#img14"><img id="img14" src="photos/IMG_14.jpg" alt="Image 14" loading="lazy"></a>
-      <a class="card" href="#img15"><img id="img15" src="photos/IMG_15.jpg" alt="Image 15" loading="lazy"></a>
-      <a class="card" href="#img16"><img id="img16" src="photos/IMG_16.jpg" alt="Image 16" loading="lazy"></a>
+      <!-- NUMERICAL ORDER -->
+      <a class="thumb" href="photos/IMG_1.jpg"><img src="photos/IMG_1.jpg" alt="Photograph 1" loading="lazy"></a>
+      <a class="thumb" href="photos/IMG_2.jpg"><img src="photos/IMG_2.jpg" alt="Photograph 2" loading="lazy"></a>
+      <a class="thumb" href="photos/IMG_3.jpg"><img src="photos/IMG_3.jpg" alt="Photograph 3" loading="lazy"></a>
+      <a class="thumb" href="photos/IMG_4.jpg"><img src="photos/IMG_4.jpg" alt="Photograph 4" loading="lazy"></a>
+      <a class="thumb" href="photos/IMG_5.jpg"><img src="photos/IMG_5.jpg" alt="Photograph 5" loading="lazy"></a>
+      <a class="thumb" href="photos/IMG_6.jpg"><img src="photos/IMG_6.jpg" alt="Photograph 6" loading="lazy"></a>
+      <a class="thumb" href="photos/IMG_7.jpg"><img src="photos/IMG_7.jpg" alt="Photograph 7" loading="lazy"></a>
+      <a class="thumb" href="photos/IMG_8.jpg"><img src="photos/IMG_8.jpg" alt="Photograph 8" loading="lazy"></a>
+      <a class="thumb" href="photos/IMG_9.jpg"><img src="photos/IMG_9.jpg" alt="Photograph 9" loading="lazy"></a>
+      <a class="thumb" href="photos/IMG_10.jpg"><img src="photos/IMG_10.jpg" alt="Photograph 10" loading="lazy"></a>
+      <a class="thumb" href="photos/IMG_11.jpg"><img src="photos/IMG_11.jpg" alt="Photograph 11" loading="lazy"></a>
+      <a class="thumb" href="photos/IMG_12.jpg"><img src="photos/IMG_12.jpg" alt="Photograph 12" loading="lazy"></a>
+      <a class="thumb" href="photos/IMG_13.jpg"><img src="photos/IMG_13.jpg" alt="Photograph 13" loading="lazy"></a>
+      <a class="thumb" href="photos/IMG_14.jpg"><img src="photos/IMG_14.jpg" alt="Photograph 14" loading="lazy"></a>
+      <a class="thumb" href="photos/IMG_15.jpg"><img src="photos/IMG_15.jpg" alt="Photograph 15" loading="lazy"></a>
+      <a class="thumb" href="photos/IMG_16.jpg"><img src="photos/IMG_16.jpg" alt="Photograph 16" loading="lazy"></a>
 
     </section>
   </main>
 
-  <script>
-    // If someone visits photos.html#img10, scroll that image into view
-    function scrollToHash() {
-      const id = window.location.hash.replace("#", "");
-      if (!id) return;
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <div class="lightbox-inner">
+      <div class="close-hint">tap outside / esc</div>
+      <img id="lightboxImg" alt="">
+    </div>
+  </div>
 
-      const el = document.getElementById(id);
-      if (el) {
-        // slight delay so layout is ready
-        setTimeout(() => {
-          el.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
-        }, 60);
-      }
+  <script>
+    const thumbs = Array.from(document.querySelectorAll(".thumb"));
+    const lightbox = document.getElementById("lightbox");
+    const lightboxImg = document.getElementById("lightboxImg");
+
+    function openLightbox(src, alt){
+      lightboxImg.src = src;
+      lightboxImg.alt = alt || "";
+      lightbox.classList.add("open");
+      lightbox.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
     }
 
-    window.addEventListener("load", scrollToHash);
-    window.addEventListener("hashchange", scrollToHash);
+    function closeLightbox(){
+      lightbox.classList.remove("open");
+      lightbox.setAttribute("aria-hidden", "true");
+      lightboxImg.removeAttribute("src");
+      document.body.style.overflow = "";
+    }
+
+    thumbs.forEach(a => {
+      a.addEventListener("click", (e) => {
+        e.preventDefault();
+        const img = a.querySelector("img");
+        const src = a.getAttribute("href");
+        openLightbox(src, img ? img.alt : "");
+      });
+    });
+
+    // Click outside image closes
+    lightbox.addEventListener("click", (e) => {
+      if (e.target === lightbox || e.target === lightboxImg) closeLightbox();
+    });
+
+    // ESC closes
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && lightbox.classList.contains("open")) closeLightbox();
+    });
   </script>
+
 </body>
 </html>
