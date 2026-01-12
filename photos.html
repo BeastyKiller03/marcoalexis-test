@@ -5,36 +5,60 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Photographs – marcoalexismaria</title>
 
-  <!-- your global css (menu vibe) -->
+  <!-- Keep using your global CSS -->
   <link rel="stylesheet" href="style.css" />
 
   <style>
+    /* ========= IMPORTANT OVERRIDES (fixes grey) ========= */
+
+    /* Turn OFF the global veil from style.css on this page */
+    body::before { content: none !important; display: none !important; }
+
+    /* If your style.css dims images by default, this hard-resets it */
+    img, a, .thumb, .thumb img {
+      opacity: 1 !important;
+      filter: none !important;
+      mix-blend-mode: normal !important;
+    }
+
+    /* ========= Page base ========= */
     * { box-sizing: border-box; }
 
     html, body {
       margin: 0;
       padding: 0;
+      height: auto;
+      overflow-x: hidden;
+      overflow-y: auto;              /* allow scrolling */
       background: #faf9f6;
       color: #111;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-      overflow-x: hidden;
     }
 
-    /* ===== Top bar (index-like) ===== */
-    .topbar{
+    /* ========= Header (hide on scroll down, show on scroll up) ========= */
+    .topbar {
       position: sticky;
       top: 0;
-      z-index: 50;
-      padding: calc(14px + env(safe-area-inset-top)) 16px 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 14px;
-      background: #faf9f6;               /* solid (no haze) */
+      z-index: 1000;
+      background: #faf9f6;
       border-bottom: 1px solid rgba(0,0,0,0.06);
+      padding: calc(12px + env(safe-area-inset-top)) 14px 10px;
+      transition: transform 220ms ease, box-shadow 220ms ease;
+      will-change: transform;
     }
 
-    .brand-name{
+    .topbar.is-hidden {
+      transform: translateY(-120%);
+    }
+
+    .topbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand-name {
       font-size: 12px;
       letter-spacing: 0.10em;
       text-transform: lowercase;
@@ -43,127 +67,128 @@
       white-space: nowrap;
     }
 
-    .nav{
+    /* Mobile-friendly menu: horizontal scroll row */
+    .nav {
       display: flex;
       gap: 14px;
       align-items: center;
       justify-content: flex-end;
-      max-width: 72vw;
+      max-width: 70vw;
       overflow-x: auto;
+      overflow-y: hidden;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
       padding-bottom: 2px;
     }
-    .nav::-webkit-scrollbar{ display:none; }
 
-    .nav a{
+    .nav::-webkit-scrollbar { display: none; }
+
+    .nav a {
       font-size: 12px;
       text-decoration: none;
       color: #111;
       white-space: nowrap;
       opacity: 0.95;
     }
-    .nav a:hover{ opacity: 0.6; }
 
-    /* ===== Gallery ===== */
-    .wrap{
+    .nav a:hover { opacity: 0.6; }
+
+    /* ========= Gallery ========= */
+    .wrap {
       width: min(1200px, 100%);
       margin: 0 auto;
-      padding: 18px 16px 36px;
+      padding: 18px 14px 40px;
     }
 
-    .grid{
+    .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 14px;
     }
 
-    .thumb{
+    .thumb {
       display: block;
       text-decoration: none;
       cursor: zoom-in;
-      /* IMPORTANT: no opacity rules here (prevents greying) */
-      opacity: 1;
-      filter: none;
-      transform: none;
     }
 
-    .thumb img{
+    .thumb img {
       width: 100%;
       height: auto;
       display: block;
-      border-radius: 0;                 /* no rounding */
-      opacity: 1;                       /* force normal */
-      filter: none;                     /* no grayscale */
-      box-shadow: 0 8px 18px rgba(0,0,0,0.08);
-      transition: transform .15s ease;
+      border-radius: 0; /* no rounding */
+      box-shadow: 0 10px 22px rgba(0,0,0,0.08);
+      transition: transform 150ms ease;
     }
 
-    .thumb:hover img{
+    .thumb:hover img {
       transform: translateY(-1px);
     }
 
-    /* ===== Lightbox ===== */
-    .lightbox{
+    /* ========= Lightbox ========= */
+    .lightbox {
       position: fixed;
       inset: 0;
       z-index: 9999;
-      background: #faf9f6;              /* solid */
+      background: rgba(250,249,246,0.98);
       display: none;
       align-items: center;
       justify-content: center;
       padding: 18px;
     }
-    .lightbox.open{ display:flex; }
 
-    .lightbox img{
+    .lightbox.open { display: flex; }
+
+    .lightbox img {
       max-width: 100%;
-      max-height: calc(100vh - 80px);
-      border-radius: 0;                 /* no rounding */
+      max-height: calc(100vh - 70px);
+      border-radius: 0; /* no rounding */
       box-shadow: 0 18px 40px rgba(0,0,0,0.18);
       cursor: zoom-out;
     }
 
-    .close-hint{
+    .close-hint {
       position: absolute;
-      top: 14px;
-      right: 16px;
+      top: 12px;
+      right: 14px;
       font-size: 11px;
       letter-spacing: .05em;
       opacity: .55;
       pointer-events: none;
     }
 
-    /* Mobile */
-    @media (max-width: 520px){
-      .grid{
+    /* ========= Mobile tweaks ========= */
+    @media (max-width: 520px) {
+      .grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 12px;
       }
-      .brand-name, .nav a{ font-size: 11px; }
+      .brand-name, .nav a { font-size: 11px; }
+      .nav { max-width: 74vw; }
     }
   </style>
 </head>
 
 <body>
 
-  <!-- Top bar -->
-  <header class="topbar">
-    <a class="brand-name" href="index.html">marcoalexismaria</a>
+  <!-- Header -->
+  <header class="topbar" id="topbar">
+    <div class="topbar-inner">
+      <a class="brand-name" href="index.html">marcoalexismaria</a>
 
-    <nav class="nav">
-      <a href="videos.html">Videos</a>
-      <a href="music.html">Music</a>
-      <a href="photos.html">Photographs</a>
-      <a href="events.html">Events</a>
-      <a href="background.html">About</a>
-    </nav>
+      <nav class="nav" aria-label="Primary">
+        <a href="videos.html">Videos</a>
+        <a href="music.html">Music</a>
+        <a href="photos.html">Photographs</a>
+        <a href="events.html">Events</a>
+        <a href="background.html">About</a>
+      </nav>
+    </div>
   </header>
 
   <!-- Gallery -->
   <main class="wrap">
     <section class="grid">
-
       <!-- Highest at top, lowest at bottom -->
       <a class="thumb" href="photos/IMG_16.jpg"><img src="photos/IMG_16.jpg" alt="Photograph 16" loading="lazy"></a>
       <a class="thumb" href="photos/IMG_15.jpg"><img src="photos/IMG_15.jpg" alt="Photograph 15" loading="lazy"></a>
@@ -181,17 +206,17 @@
       <a class="thumb" href="photos/IMG_3.jpg"><img src="photos/IMG_3.jpg" alt="Photograph 3" loading="lazy"></a>
       <a class="thumb" href="photos/IMG_2.jpg"><img src="photos/IMG_2.jpg" alt="Photograph 2" loading="lazy"></a>
       <a class="thumb" href="photos/IMG_1.jpg"><img src="photos/IMG_1.jpg" alt="Photograph 1" loading="lazy"></a>
-
     </section>
   </main>
 
   <!-- Lightbox -->
   <div class="lightbox" id="lightbox">
-    <span class="close-hint">click image / esc</span>
+    <span class="close-hint">tap image / esc</span>
     <img id="lightboxImg" alt="">
   </div>
 
   <script>
+    /* ===== Lightbox ===== */
     const thumbs = document.querySelectorAll(".thumb");
     const lightbox = document.getElementById("lightbox");
     const lightboxImg = document.getElementById("lightboxImg");
@@ -213,8 +238,34 @@
 
     lightbox.addEventListener("click", closeLightbox);
     document.addEventListener("keydown", (e) => {
-      if(e.key === "Escape") closeLightbox();
+      if (e.key === "Escape") closeLightbox();
     });
+
+    /* ===== Hide header on scroll down, show on scroll up ===== */
+    const topbar = document.getElementById("topbar");
+    let lastY = window.scrollY;
+
+    window.addEventListener("scroll", () => {
+      const y = window.scrollY;
+
+      // always show at very top
+      if (y <= 10) {
+        topbar.classList.remove("is-hidden");
+        lastY = y;
+        return;
+      }
+
+      // scrolling down -> hide
+      if (y > lastY + 6) {
+        topbar.classList.add("is-hidden");
+      }
+      // scrolling up -> show
+      else if (y < lastY - 6) {
+        topbar.classList.remove("is-hidden");
+      }
+
+      lastY = y;
+    }, { passive: true });
   </script>
 
 </body>
